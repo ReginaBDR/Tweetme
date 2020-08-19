@@ -1,0 +1,11 @@
+{% extends "blog/layout.html" %}
+{% block content %}
+<div class="container my-5 text-center">
+    <h3 class="text-ocean font-weight-bold">You've been logged out</h3>
+    <div class="pt-3">
+        <span class="text-muted">
+            Login again? <a class="ml-2" href="{% url 'login' %}">Login</a>
+        </span>
+    </div>
+</div>
+{% endblock content %}

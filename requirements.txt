@@ -1,0 +1,9 @@
+dj-database-url
+Django
+django-crispy-forms
+Jinja2
+Pillow
+psycopg2
+pytz
+sqlparse
+

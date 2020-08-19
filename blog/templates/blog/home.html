@@ -1,0 +1,146 @@
+{% extends "blog/layout.html" %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-12 col-md-9 scrollable px-md-5">
+        <div class="row ">
+            <div class="col-6">
+                <h3 class="h1 mb-3">Posts</h3>
+            </div>
+            <div class="col-6 no-padding">
+                <h6 style="position: absolute; bottom: 0; right: 0" class="mb-3">
+                    {{ page_obj.start_index }} - {{ page_obj.end_index }} of
+                    {{ paginator.count }}
+                </h6>
+            </div>
+        </div>
+        {% for post in posts %}
+        <article class="media content-section hovered-tweet shadow">
+            <div style="width: 100%; word-break: break-all;">
+                <div class="pb-2 row m-0" style="width: 100%; margin-right: 0 !important;">
+                    <div class="col-8 no-padding d-flex pl-0 align-items-center">
+                        <img class="rounded-circle mr-2" width="20px" height="20px"
+                            src="{{ post.author.profile.image.url }}">
+                        <a class="mr-2 font-weight-bold text-ocean" href="{% url 'user-posts' post.author %}">
+                            {{ post.author }}
+                        </a>
+                    </div>
+                    <div class="col-4 d-flex flex-row-reverse no-padding align-items-center">
+                        {% if post.author == user %}
+                        <a class="material-icons ml-3" style="font-size: 14px"
+                            href="{% url 'post-delete' post.id %}">delete</a>
+                        <a class="material-icons ml-3" style="font-size: 14px"
+                            href="{% url 'post-update' post.id %}">edit</a>
+                        {%  endif %}
+                    </div>
+                </div>
+                <div class="mb-2" style="width: 100%; height: 1px;"></div>
+                <a href="{% url 'post-detail' post.id %}">
+                    <p class="mb-4 p-2 text-ocean">{{ post.content }}</p>
+                </a>
+                <div class="row">
+                    <div class="col-md-6 d-flex align-items-baseline justify-content-start">
+                        <small>
+                            <!-- Like Buttons Here -->
+                            <a href="#" onClick="document.getElementById('likebutton').submit()">
+                                {% if post.likes == 1  %}
+                                <i style="color: purple; font-size: 15px; vertical-align: middle;" class="material-icons pr-1">favorite</i>
+                                {% else %}
+                                <i style=" font-size: 15px; vertical-align: middle;" class="material-icons pr-1">favorite_border</i>
+                                {% endif %}
+                                {{ post.likes }} like(s)
+                            </a>
+                            <form id="likebutton" method="POST" action="{% url 'postpreference' post.id 1%}">
+                                {% csrf_token %}
+                                <input type="hidden">
+                            </form>
+                        </small>
+                        <small>
+                            <a href="/post/{{post.id}}/">
+                                <i style="font-size: 14px; vertical-align: middle;" class="material-icons pr-1 ml-3">insert_comment</i> {{ post.number_of_comments }}
+                                comment(s)
+                            </a>
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small style="opacity: 0.4;" class="white-important d-flex full-width flex-row-reverse">
+                            {{ post.date_posted | date:"H:i l, d.m.y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+
+        <div class="full-width d-flex justify-content-center mb-sm-4">
+            {% if is_paginated %}
+            {% if page_obj.has_previous %}
+            <a class="btn btn-pag mb-4 mr-2" href="?page=1">First</a>
+            <a class="btn btn-pag mb-4 mr-2"
+                href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <a class="btn btn-pag mb-4 mr-2" href="?page={{ num }}">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-pag mb-4 mr-2" href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a class="btn btn-pag mb-4 mr-2" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="btn btn-pag mb-4 mr-2" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-3">
+        <form action="{% url 'search' %}" method="post">{% csrf_token %}
+            <div class="search-container shadow">
+                <div class="search">
+                    <input required name="search" type="text" id="zip-code-input" placeholder="Search">
+                    <button type="submit" style="border:0; background: transparent;"><i class="material-icons">search</i>
+                    </button> </a>
+        </form>
+    </div>
+</div>
+        
+        {%  if user_profile is None %}
+        <h3 class="my-3">Trending</h3>
+        <article class="t-section media content-section shadow">
+            <div class="row ">
+                <div class="col-12">
+                    <h3 class="h5 text-left pb-0 pl-1">Who to follow</h3>
+                    <hr color="grey">
+                </div>
+                <ul class="col-12">
+                    {% for user in all_users %}
+                    <li>
+                        <div class="who-to-follow my-2">
+                            <div class="col-8 no-padding d-flex align-items-center">
+                                <img class="rounded-circle mr-3" width="25px" height="25px" src="{{ user.profile.image.url }}">
+                                <a class="mr-2 text-ocean font-weight-bold" href="{% url 'user-posts' user.username %}">
+                                    {{ user.username }}
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </article>
+        {% endif %}
+        <footer class="text-center mt-2" style="font-size: 12px;">
+            <ul>
+                <a href="" class="mr-2 text-ocean">Terms</a>
+                <a href="" class="mr-2 text-ocean">Privacy policy</a>
+                <a href="" class="mr-2 text-ocean">Cookies</a>
+            </ul>
+            <span>© 2020 Network by Regina Borgno.</span> 
+           </footer>
+        </div>
+        </div>
+{% endblock content %}        
+
+        

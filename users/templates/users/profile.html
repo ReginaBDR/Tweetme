@@ -1,0 +1,106 @@
+{% extends "blog/layout.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container my-3">
+    <div class="row">
+    <div class="col-sm-12 col-md-4">
+        <div class="profile-section shadow">
+            <div class="media content-section" style="height: 140px; width: 100%">
+                {%  if user_profile != None %}
+                <div class="mt-2 d-flex full-width align-items-center">
+                    <img class="rounded-circle mr-3 img-fluid" width="100px" height="100px"
+                        src="{{ user_profile.profile.image.url }}">
+                    <div>
+                        <h4 class="text-white text-left font-weight-bold">{{ user_profile.username }}</h4>
+                        <h6 class="email-profile text-white text-left">{{ user.email }}</h6>
+                    </div>
+                </div>
+                {%  else %}
+                <div class="mt-2 d-flex full-width align-items-center">
+                    <img class="rounded-circle mr-3 img-fluid" width="100px" height="100px"
+                        src="{{ user.profile.image.url }}">
+                    <div>
+                        <h4 class="text-white text-left font-weight-bold">{{ user.username }}</h4>
+                        <h6 class="email-profile text-left text-white">{{ user.email }}</h6>
+                    </div>
+                </div>
+                {%  endif %}
+            </div>
+            <div class="media content-section">
+                <div class="row full-width mx-auto text-center text-white">
+                    <div class="col-6">Followers</div>
+                    <div class="col-6">Following</div>
+                    {%  if user_profile != None %}
+                    <div class="col-6">
+                        <h3 class="text-white follow-click">
+                            <a href="{% url 'user-followers' user_profile.username %}">
+                                {{ user_profile.profile.followers }}
+                            </a></h3>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'user-follows' user_profile.username %}">
+                            <h3 class="text-white follow-click">
+                                {{ user_profile.profile.following }}
+                            </h3>
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="col-6">
+                        <a href="{% url 'user-followers' user.username %}">
+                            <h3 class="text-white follow-click">
+                                {{ user.profile.followers }}
+                            </h3>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{% url 'user-follows' user.username %}">
+                            <h3 class="text-white follow-click">
+                                {{ user.profile.following }}
+                            </h3>
+                        </a>
+                    </div>
+                    {%  endif %}
+                </div>
+            </div>
+
+            <div class="container d-flex justify-content-center">
+                {% if user_profile is None %}
+                <div class="mx-auto">
+                    <a class="btn btn-outline-secondary mb-3 shadow" href="{% url 'post-create' %}">New Post</a>
+                </div>
+                {% endif %}
+                {%  if user_profile is not None and user_profile.id != user.id  and user.username != '' %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <button style="margin-left: 18px" class="btn btn-outline-secondary shadow"
+                            name="{% if can_follow %}follow{% else %}unfollow{% endif %}" type="submit">
+                            {% if can_follow %}
+                            FOLLOW
+                            {% else %}
+                            UNFOLLOW
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-sm-12 col-md-6 mx-auto mt-3">
+        <h3 class="white-important text-center">Edit your profile</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ uform | crispy }}
+                {{ pform | crispy }}
+            </fieldset>
+            <div class="form-group text-center">
+                <button class="btn btn-outline-primary shadow" type="submit">Change data</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock content %}

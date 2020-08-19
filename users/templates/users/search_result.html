@@ -1,0 +1,31 @@
+{% extends 'blog/layout.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-2">
+    <div class="form-group">
+        <form action="{% url 'search' %}" method="post">{% csrf_token %}
+            <div style="width: 100%" class="search-container shadow">
+                <div class="search">
+                    <input required name="search" type="text" id="zip-code-input" placeholder="Search Twitter">
+                    <button type="submit" style="border:0; background: transparent;"><i class="material-icons">search</i></button></a>
+                </div>
+        </form>
+    </div>
+    {% if results %}
+    {% for result in results %}
+    <div class="search-result-profile my-4 shadow">
+        <div class="col-8 no-padding d-flex align-items-center">
+            <img class="rounded-circle mr-3" width="40px;" height="40px;" src="{{ result.profile.image.url }}">
+            <a class="mr-2 white-important" href="{% url 'user-posts' result.username %}">
+                {{ result.username }}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        <span>No results found</span>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
